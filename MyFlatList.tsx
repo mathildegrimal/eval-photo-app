@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     View,
     FlatList,
@@ -6,14 +6,12 @@ import {
     StatusBar,
     Image
 } from 'react-native';
-import {CapturedPicture} from "expo-camera/build/Camera.types";
+import { CapturedPicture } from "expo-camera/build/Camera.types";
 
-const Picture : React.FunctionComponent<{item : CapturedPicture}> = ({item}) => (
-    <Image source={{uri:item.uri}} style={styles.image} />
-);
+
 
 const renderPicture : React.FunctionComponent<{item : CapturedPicture}> = ({item}) => (
-    <Picture item={item}/>
+    <Image source={{uri:item.uri}} style={styles.image} />
 );
 
 interface FlatListDataProps {
@@ -21,9 +19,8 @@ interface FlatListDataProps {
 }
 
 export default function MyFlatList({data}:FlatListDataProps){
-
     return (
-        <View>
+        <View style={styles.container}>
             <FlatList
                 horizontal
                 data={data}
@@ -35,8 +32,12 @@ export default function MyFlatList({data}:FlatListDataProps){
 };
 
 const styles = StyleSheet.create({
+    container:{
+        backgroundColor:'black',
+    },
     image:{
         width:70,
         height:70,
+        margin:5,
     }
 });
