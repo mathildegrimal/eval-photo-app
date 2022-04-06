@@ -6,8 +6,11 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from "axios";
 
 interface MyCameraProps {
-    setImages: React.Dispatch<React.SetStateAction<string[]>>;
-    images:string[];
+    // setImages: React.Dispatch<React.SetStateAction<string[]>>;
+    // images:string[];
+    setImages: React.Dispatch<React.SetStateAction<CapturedPicture[]>>;
+    images:CapturedPicture[];
+
 }
 
 export default function MyCamera({setImages, images}:MyCameraProps){
@@ -23,6 +26,7 @@ export default function MyCamera({setImages, images}:MyCameraProps){
     }, []);
 
 
+    //location :  demander la permission et ensuite l'utiliser
 
     if (hasPermission === null) {
         return <View />;
@@ -33,10 +37,11 @@ export default function MyCamera({setImages, images}:MyCameraProps){
     const takePicture = async () => {
         if (!cameraRef) return;
         const photo = await cameraRef.takePictureAsync({base64:true, quality:0.5});
-        const r = axios.post('https://api-pictures.herokuapp.com', {picture:photo.base64});
+        setImages([...images, photo])
+        //console.log(images)
+        // const r = axios.post('https://api-pictures.herokuapp.com', {picture:photo.base64});
 
-        const {data} = await axios.get('https://api-pictures.herokuapp.com/pictures');
-        console.log(data);
+        // const {data} = await axios.get('https://api-pictures.herokuapp.com/pictures');
         //setImages(data);
     }
 

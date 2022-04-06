@@ -9,7 +9,9 @@ import {Ionicons} from "@expo/vector-icons";
 import { AntDesign } from '@expo/vector-icons';
 
 export default function App() {
-    const [images, setImages]=useState<string[]>([]);
+    // const [images, setImages]=useState<string[]>([]);
+    const [images, setImages]=useState<CapturedPicture[]>([]);
+
     const [modalVisible, setModalVisible] = useState(false);
 
     // useEffect(() => {
@@ -33,7 +35,7 @@ export default function App() {
               style={styles.modalButton}
               onPress={() => setModalVisible(true)}
           >
-              <AntDesign name="picture" size={40} color="#f72585" />
+              <AntDesign name="picture" size={35} color="#f72585" />
           </TouchableOpacity>
       </View>
   );

@@ -2,10 +2,13 @@ import React, {useEffect, useState} from 'react';
 
 import {Alert, Modal, StyleSheet, Text, Pressable, View, Image} from 'react-native';
 import axios from "axios";
+import { CapturedPicture } from 'expo-camera/build/Camera.types';
 interface ModalProps{
     modalVisible:boolean;
     setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    images:string[];
+    // images:string[];
+    images:CapturedPicture[];
+
 }
 export default function MyGallery({modalVisible, setModalVisible, images}:ModalProps){
     // const [images, setImages] = useState([]);
@@ -16,6 +19,7 @@ export default function MyGallery({modalVisible, setModalVisible, images}:ModalP
     //         setImages(data);
     //     })();
     // }, []);
+    console.log(images);
 
     return (
         <View>
@@ -30,13 +34,19 @@ export default function MyGallery({modalVisible, setModalVisible, images}:ModalP
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
                         <View style={styles.gallery}>
-                            {images && images.map((img:string, index:number)=>{
+                            {/*{images && images.map((img:string, index:number)=>{*/}
 
+                            {/*    return(*/}
+                            {/*    <Image style={styles.images} source={{uri: `https://api-pictures.herokuapp.com/pictures/${img}`}} key={index} />*/}
+                            {/*    )*/}
+                            {/*}*/}
+                            {/*)}*/}
+                            {images && images.map((img:CapturedPicture, index:number)=>{
+                            console.log('IMAGE',img)
                                 return(
-                                <Image style={styles.images} source={{uri: `https://api-pictures.herokuapp.com/pictures/${img}`}} key={index} />
+                                    <Image style={styles.images} source={{uri:img.uri}} key={index} />
                                 )
-                            }
-                            )}
+                            })}
                         </View>
                         <Pressable
                             style={[styles.button, styles.buttonClose]}
@@ -99,7 +109,7 @@ const styles = StyleSheet.create({
         width:'100%',
     },
     images:{
-        width:100,
+        width:'30%',
         height:100,
         margin:5,
         borderRadius:10
