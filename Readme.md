@@ -34,5 +34,7 @@ You can :
 
 ## Improvements
 
-The "cloud icon" does not change to "done" when the saving is done in the phone gallery.
+- The "cloud icon" does not change to "done" when the saving is done in the phone gallery.
 I tried to do this with changing the global state, but without success.
+
+- Missed also the upload on node js server, will try it soon !
