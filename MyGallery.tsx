@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {StyleSheet, View, Image, FlatList, TouchableOpacity, Share,} from 'react-native';
+import { BottomSheet, Button, ListItem } from '@rneui/themed';
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {AntDesign, Feather, Ionicons, SimpleLineIcons} from "@expo/vector-icons";
@@ -13,6 +14,8 @@ interface ItemProps {
     uri:string;
     saved:boolean;
 }
+type BottomSheetComponentProps = {};
+
 const renderPicture : React.FunctionComponent<{item : Picture}> = ({item}) => (<PictureItem uri={item.uri} saved={item.saved}/>);
 
 function PictureItem({ uri, saved}:ItemProps) {
@@ -20,15 +23,12 @@ function PictureItem({ uri, saved}:ItemProps) {
     const {value : pictures } = useSelector((state:RootState)=>state.picture);
     const dispatch = useDispatch();
     const [status, requestPermission] = MediaLibrary.usePermissions();
+    const [isVisible, setIsVisible] = useState(false);
 
 
 
     const deletePicture = async (uriToDelete:string)=>{
-        if(pictures){
-            const keptPictures = pictures?.filter(object => object.uri !== uriToDelete);
-            dispatch(setPictures(keptPictures));
-            await AsyncStorage.setItem('@pictures', JSON.stringify(pictures));
-        }
+        setIsVisible(true);
     }
 
     const savePicture = async (uriToAdd:string)=>{
@@ -60,6 +60,27 @@ function PictureItem({ uri, saved}:ItemProps) {
             alert(error.message);
         }
     }
+    const list = [
+        {
+            title: 'Supprimer',
+            containerStyle: { backgroundColor: 'red' },
+            titleStyle: { color: 'white' },
+            onPress: async (uriToDelete:string) => {
+                setIsVisible(false);
+                if(pictures){
+                    const keptPictures = pictures?.filter(object => object.uri !== uriToDelete);
+                    dispatch(setPictures(keptPictures));
+                    await AsyncStorage.setItem('@pictures', JSON.stringify(pictures));
+                }
+            },
+        },
+        {
+            title: 'Annuler',
+            containerStyle: { backgroundColor: 'white' },
+            titleStyle: { color: 'black' },
+            onPress: () => setIsVisible(false),
+        },
+    ];
 
     return(
     <View style={styles.imagesWrapper}>
@@ -83,6 +104,19 @@ function PictureItem({ uri, saved}:ItemProps) {
             >
                 { saved ? <Ionicons name="cloud-done-sharp" size={24} color="black" /> : <AntDesign name="cloudo" size={24} color="black" />}
             </TouchableOpacity>
+            <BottomSheet modalProps={{}} isVisible={isVisible}>
+                {list.map((l, i) => (
+                    <ListItem
+                        key={i}
+                        containerStyle={l.containerStyle}
+                        onPress={()=>l.onPress(uri)}
+                    >
+                        <ListItem.Content>
+                            <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                        </ListItem.Content>
+                    </ListItem>
+                ))}
+            </BottomSheet>
         </View>
     </View>
     );
