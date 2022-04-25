@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState} from 'react';
 
 import {StyleSheet, View, Image, FlatList, TouchableOpacity, Share,} from 'react-native';
-import { BottomSheet, Button, ListItem } from '@rneui/themed';
+import { BottomSheet, ListItem } from '@rneui/themed';
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {AntDesign, Feather, Ionicons, SimpleLineIcons} from "@expo/vector-icons";
@@ -10,22 +10,19 @@ import {RootState} from "./store";
 import {setPictures} from "./picture.store";
 import * as MediaLibrary from 'expo-media-library';
 import { Picture } from './picture.type';
+
 interface ItemProps {
     uri:string;
     saved:boolean;
 }
-type BottomSheetComponentProps = {};
 
 const renderPicture : React.FunctionComponent<{item : Picture}> = ({item}) => (<PictureItem uri={item.uri} saved={item.saved}/>);
 
 function PictureItem({ uri, saved}:ItemProps) {
-    console.log(saved);
     const {value : pictures } = useSelector((state:RootState)=>state.picture);
     const dispatch = useDispatch();
     const [status, requestPermission] = MediaLibrary.usePermissions();
     const [isVisible, setIsVisible] = useState(false);
-
-
 
     const deletePicture = async (uriToDelete:string)=>{
         setIsVisible(true);
@@ -34,21 +31,18 @@ function PictureItem({ uri, saved}:ItemProps) {
     const savePicture = async (uriToAdd:string)=>{
         await requestPermission();
         const asset = await MediaLibrary.createAssetAsync(uriToAdd);
-        if(asset){
+        if(asset) {
             const savedPictures = pictures?.map(object => {
-                if(object.uri == uriToAdd) {
-                    return {...object, saved:true};
+                if (object.uri == uriToAdd) {
+                    return {...object, saved: true};
                 } else {
                     return object;
                 }
             });
-            console.log(savedPictures)
-            if(savedPictures){
+            if (savedPictures) {
                 setPictures(savedPictures);
-                console.log(pictures);
             }
         }
-
     }
 
     const sharePicture = async (uriToShare:string)=>{
