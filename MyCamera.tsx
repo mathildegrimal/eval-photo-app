@@ -1,49 +1,51 @@
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {Camera} from "expo-camera";
 import React, {useEffect, useState} from "react";
-import {CapturedPicture} from "expo-camera/build/Camera.types";
 import { Ionicons } from '@expo/vector-icons';
-import axios from "axios";
+import {useDispatch, useSelector} from "react-redux";
+import  AsyncStorage  from '@react-native-async-storage/async-storage';
 
-interface MyCameraProps {
-    // setImages: React.Dispatch<React.SetStateAction<string[]>>;
-    // images:string[];
-    setImages: React.Dispatch<React.SetStateAction<CapturedPicture[]>>;
-    images:CapturedPicture[];
+import {RootState} from "./store";
+import {setPictures} from "./picture.store";
 
-}
-
-export default function MyCamera({setImages, images}:MyCameraProps){
-    const [hasPermission, setHasPermission] = useState(false);
+export default function MyCamera(){
+    const [hasCameraPermission, setHasCameraPermission] = useState(false);
     const [type, setType] = useState(Camera.Constants.Type.back);
     const [cameraRef, setCameraRef] = useState<Camera | null>(null);
+    const {value : pictures } = useSelector((state:RootState)=>state.picture);
+
+    const dispatch = useDispatch();
+
+
 
     useEffect(() => {
         (async () => {
             const { status } = await Camera.requestCameraPermissionsAsync();
-            setHasPermission(status === 'granted');
+            setHasCameraPermission(status === 'granted');
         })();
     }, []);
 
 
-    //location :  demander la permission et ensuite l'utiliser
-
-    if (hasPermission === null) {
+    if (hasCameraPermission === null) {
         return <View />;
     }
-    if (!hasPermission) {
+    if (!hasCameraPermission) {
         return <Text>No access to camera</Text>;
     }
+
+
     const takePicture = async () => {
         if (!cameraRef) return;
-        const photo = await cameraRef.takePictureAsync({base64:true, quality:0.5});
-        setImages([...images, photo])
-        //console.log(images)
-        // const r = axios.post('https://api-pictures.herokuapp.com', {picture:photo.base64});
-
-        // const {data} = await axios.get('https://api-pictures.herokuapp.com/pictures');
-        //setImages(data);
+        const picture = await cameraRef.takePictureAsync({ quality:0.5});
+        if(pictures){
+            const pictureToAdd = {...picture, saved:false};
+            dispatch(setPictures([pictureToAdd, ...pictures]));
+        } else {
+            dispatch(setPictures([{...picture, saved:false}]));
+        }
+        await AsyncStorage.setItem('@pictures', JSON.stringify(pictures));
     }
+
 
     const setFace = () => {
         setType(

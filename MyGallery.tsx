@@ -1,117 +1,144 @@
 import React, {useEffect, useState} from 'react';
 
-import {Alert, Modal, StyleSheet, Text, Pressable, View, Image} from 'react-native';
-import axios from "axios";
-import { CapturedPicture } from 'expo-camera/build/Camera.types';
-interface ModalProps{
-    modalVisible:boolean;
-    setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    // images:string[];
-    images:CapturedPicture[];
+import {StyleSheet, View, Image, FlatList, TouchableOpacity, Share,} from 'react-native';
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {AntDesign, Feather, Ionicons, SimpleLineIcons} from "@expo/vector-icons";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "./store";
+import {setPictures} from "./picture.store";
+import * as MediaLibrary from 'expo-media-library';
+import { Picture } from './picture.type';
+interface ItemProps {
+    uri:string;
+    saved:boolean;
 }
-export default function MyGallery({modalVisible, setModalVisible, images}:ModalProps){
-    // const [images, setImages] = useState([]);
-    //
-    // useEffect(() => {
-    //     (async () => {
-    //         const {data} = await axios.get('https://api-pictures.herokuapp.com/pictures');
-    //         setImages(data);
-    //     })();
-    // }, []);
-    console.log(images);
+const renderPicture : React.FunctionComponent<{item : Picture}> = ({item}) => (<PictureItem uri={item.uri} saved={item.saved}/>);
+
+function PictureItem({ uri, saved}:ItemProps) {
+    console.log(saved);
+    const {value : pictures } = useSelector((state:RootState)=>state.picture);
+    const dispatch = useDispatch();
+    const [status, requestPermission] = MediaLibrary.usePermissions();
+
+
+
+    const deletePicture = async (uriToDelete:string)=>{
+        if(pictures){
+            const keptPictures = pictures?.filter(object => object.uri !== uriToDelete);
+            dispatch(setPictures(keptPictures));
+            await AsyncStorage.setItem('@pictures', JSON.stringify(pictures));
+        }
+    }
+
+    const savePicture = async (uriToAdd:string)=>{
+        await requestPermission();
+        const asset = await MediaLibrary.createAssetAsync(uriToAdd);
+        if(asset){
+            const savedPictures = pictures?.map(object => {
+                if(object.uri == uriToAdd) {
+                    return {...object, saved:true};
+                } else {
+                    return object;
+                }
+            });
+            console.log(savedPictures)
+            if(savedPictures){
+                setPictures(savedPictures);
+                console.log(pictures);
+            }
+        }
+
+    }
+
+    const sharePicture = async (uriToShare:string)=>{
+        try {
+            await Share.share({
+                url: uriToShare,
+            });
+        } catch (error: any) {
+            alert(error.message);
+        }
+    }
+
+    return(
+    <View style={styles.imagesWrapper}>
+        <Image source={{uri:uri}} style={styles.images} />
+        <View style={styles.buttonContainer}>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={()=>deletePicture(uri)}
+            >
+                <SimpleLineIcons name="trash" size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={()=>sharePicture(uri)
+            }>
+                <Feather name="share" size={24} color="black" />
+            </TouchableOpacity >
+            <TouchableOpacity
+                style={styles.button}
+                onPress={()=>savePicture(uri)}
+            >
+                { saved ? <Ionicons name="cloud-done-sharp" size={24} color="black" /> : <AntDesign name="cloudo" size={24} color="black" />}
+            </TouchableOpacity>
+        </View>
+    </View>
+    );
+}
+
+export default function MyGallery(){
+
+    const {value : pictures } = useSelector((state:RootState)=>state.picture);
 
     return (
-        <View>
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                    Alert.alert('Modal has been closed.');
-                    setModalVisible(!modalVisible);
-                }}>
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <View style={styles.gallery}>
-                            {/*{images && images.map((img:string, index:number)=>{*/}
-
-                            {/*    return(*/}
-                            {/*    <Image style={styles.images} source={{uri: `https://api-pictures.herokuapp.com/pictures/${img}`}} key={index} />*/}
-                            {/*    )*/}
-                            {/*}*/}
-                            {/*)}*/}
-                            {images && images.map((img:CapturedPicture, index:number)=>{
-                            console.log('IMAGE',img)
-                                return(
-                                    <Image style={styles.images} source={{uri:img.uri}} key={index} />
-                                )
-                            })}
-                        </View>
-                        <Pressable
-                            style={[styles.button, styles.buttonClose]}
-                            onPress={() => setModalVisible(!modalVisible)}>
-                            <Text style={styles.textStyle}>Hide Modal</Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </Modal>
+        <View style={styles.gallery}>
+            <FlatList
+                horizontal
+                data={pictures}
+                renderItem={renderPicture}
+                keyExtractor={(item, index) => index.toString()}
+            />
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    centeredView: {
-        backgroundColor:'transparent',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 22,
-    },
-    modalView: {
-        width:'90%',
-        height:'90%',
-        margin: 20,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 35,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    button: {
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2,
-    },
-
-    buttonClose: {
-        backgroundColor: '#f72585',
-    },
-    textStyle: {
-        color: 'white',
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    modalText: {
-        marginBottom: 15,
-        textAlign: 'center',
-    },
     gallery:{
-       flex:1,
-        flexDirection:'row',
-        flexWrap:'wrap',
-        width:'100%',
+        display:'flex',
+        height:300,
+        overflow:'hidden',
+        alignItems:'center',
+        justifyContent:'center',
+    },
+    imagesWrapper:{
+        position:'relative',
+        width:200,
+        height:250,
     },
     images:{
-        width:'30%',
-        height:100,
-        margin:5,
-        borderRadius:10
-    }
+        flex:1,
+        borderRadius:10,
+        margin:10,
+    },
+    buttonContainer:{
+        width:'80%',
+        display:'flex',
+        flexDirection:'row',
+        position:'absolute',
+        bottom:15,
+        right:15,
+        justifyContent:'space-between',
+    },
+    button: {
+        borderRadius:50,
+        width: 40,
+        height:40,
+        display:'flex',
+        justifyContent:'center',
+        alignItems:'center',
+        backgroundColor:'white',
+        alignSelf: 'flex-end',
+    },
 });
