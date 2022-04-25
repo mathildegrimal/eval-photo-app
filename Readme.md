@@ -7,13 +7,14 @@ An app project with Expo to take, save and share pictures.
 - [Mathilde Grimal](https://github.com/mathildegrimal) - Initial work
 
 ## ⛏️ Built Using <a name = "built_using"></a>
-- Redux toolkit.
-- Local storage.
-- Type with typeScript.
-- Send picture.
-- Prettier.
+- Expo / react native
+- Redux toolkit
+- Async storage
+- Type with typeScript
+- @rneui/themed (Bottom sheet)
 
-##Run Project
+
+## Run Project
 
 You need to run :
 
