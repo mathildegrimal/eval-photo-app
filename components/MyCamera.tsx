@@ -5,8 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import {useDispatch, useSelector} from "react-redux";
 import  AsyncStorage  from '@react-native-async-storage/async-storage';
 
-import {RootState} from "./store";
-import {setPictures} from "./picture.store";
+import {RootState} from "../store/store";
+import {setPictures} from "../store/picture.store";
 
 export default function MyCamera(){
     const [hasCameraPermission, setHasCameraPermission] = useState(false);

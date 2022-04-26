@@ -7,11 +7,11 @@ An app project with Expo to take, save and share pictures.
 - [Mathilde Grimal](https://github.com/mathildegrimal) - Initial work
 
 ## ⛏️ Built Using <a name = "built_using"></a>
+- TypeScript
 - Expo / react native
 - Redux toolkit
 - Async storage
-- Type with typeScript
-- @rneui/themed (Bottom sheet)
+- @rneui/themed (BottomSheet)
 
 
 ## Run Project
@@ -27,15 +27,11 @@ To start you need to run :
 ## Usage
 
 You can :
-- save the picture into redux and local storage.
-- save the picture in your gallery
+- save the picture into redux and async storage
+- save the picture in your gallery and on a node server
 - switch camera for selfies or normal pictures
-- You can delete a photo clicking on the trash icon
-- You can share the photo with you friends
+- delete a photo clicking on the trash icon
+- share the photo with you friends using share icon
 
 ## Improvements
 
-- The "cloud icon" does not change to "done" when the saving is done in the phone gallery.
-I tried to do this with changing the global state, but without success.
-
-- Missed also the upload on node js server, will try it soon git !

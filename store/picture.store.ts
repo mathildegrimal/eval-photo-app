@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CapturedPicture } from "expo-camera/build/Camera.types";
 import {Picture, PictureState} from "./picture.type";
 
 const initialState: PictureState = {

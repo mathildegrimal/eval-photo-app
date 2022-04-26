@@ -1,10 +1,9 @@
 import {StyleSheet, View} from 'react-native';
 import React from 'react';
-import MyCamera from './MyCamera';
-
+import MyCamera from './components/MyCamera';
 import {Provider} from "react-redux";
-import {store} from "./store";
-import MyGallery from "./MyGallery";
+import {store} from "./store/store";
+import MyGallery from "./components/MyGallery";
 
 export default function App() {
     return (
