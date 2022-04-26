@@ -24,6 +24,31 @@ To start you need to run :
 
 `npm run start`
 
+You can upload photos on a node server (See the implementation of the server [here](https://github.com/humqn/server_picture_node)).
+If you choose not to use the server, please comment this part of components/PictureItem to avoid problems of request crashing.
+
+```ts
+ /**** comment this part if node server is not listening *** /
+             *
+             */
+            const formData = new FormData();
+            const uriToSend = Platform.OS === 'ios' ? uriToAdd.split('file://')[1] : uriToAdd;
+            const image = { name:'picture', type:'image/jpg', uri: uriToSend };
+
+            // @ts-ignore
+            formData.append('photo', image );
+
+            await axios.patch('http://10.50.37.166:7070/multipart-upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                transformRequest: () => {
+                    return formData; // this is doing the trick
+                }
+            });
+            ////////
+```
+
 ## Usage
 
 You can :

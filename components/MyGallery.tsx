@@ -2,10 +2,10 @@ import React from 'react';
 
 import {StyleSheet, View, FlatList,} from 'react-native';
 
-import { useSelector} from "react-redux";
+import { useSelector} from 'react-redux';
 import { RootState } from "../store/store";
 import { Picture } from '../store/picture.type';
-import PictureItem from "./PictureItem";
+import PictureItem from './PictureItem';
 
 
 const renderPicture : React.FunctionComponent<{item : Picture}> = ({item}) => (<PictureItem uri={item.uri} saved={item.saved}/>);

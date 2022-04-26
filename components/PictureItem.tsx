@@ -3,10 +3,11 @@ import {RootState} from "../store/store";
 import * as MediaLibrary from "expo-media-library";
 import React, {useState} from "react";
 import {setPictures} from "../store/picture.store";
-import {Image, Share, StyleSheet, TouchableOpacity, View} from "react-native";
+import {Image, Platform, Share, StyleSheet, TouchableOpacity, View} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {AntDesign, Feather, Ionicons, SimpleLineIcons} from "@expo/vector-icons";
 import {BottomSheet, ListItem} from "@rneui/themed";
+import axios from "axios";
 
 interface ItemProps {
     uri: string;
@@ -28,6 +29,28 @@ export default function PictureItem({ uri, saved}:ItemProps) {
         await requestPermission();
         if(status?.granted){
             const asset = await MediaLibrary.createAssetAsync(uriToAdd);
+
+
+            /**** comment this part if node server is not listening *** /
+             *
+             */
+            const formData = new FormData();
+            const uriToSend = Platform.OS === 'ios' ? uriToAdd.split('file://')[1] : uriToAdd;
+            const image = { name:'picture', type:'image/jpg', uri: uriToSend };
+
+            // @ts-ignore
+            formData.append('photo', image );
+
+            await axios.patch('http://10.50.37.166:7070/multipart-upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                transformRequest: () => {
+                    return formData; // this is doing the trick
+                }
+            });
+            ////////
+
             if(asset) {
                 const savedPictures = pictures?.map(object => {
                     if (object.uri === uriToAdd) {
