@@ -11,7 +11,7 @@ An app project with Expo to take, save and share pictures.
 - Expo / react native
 - Redux toolkit
 - Async storage
-- @rneui/themed (BottomSheet)
+- @rneui/themed (Bottom sheet)
 
 
 ## Run Project
